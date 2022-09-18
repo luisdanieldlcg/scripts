@@ -39,9 +39,10 @@ if ! command_exists "git"
 then
     echo "Installing git..."
     sudo dnf install git
-    git config --global user.name "DanikingRD"
-    git config --global user.email "danikingrd@gmail.com"
 fi
+echo "Configuring git..."
+git config --global user.name "DanikingRD"
+git config --global user.email "danikingrd@gmail.com"
 
 # Check if github cli is installed
 # Install it otherwise
