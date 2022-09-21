@@ -61,6 +61,11 @@ cd $DIR
 clone_repository "flutter" "https://github.com/notsuitablegroup/mysub-app.git"
 clone_repository "java" "https://github.com/DanikingRD/WK.git"
 
+# Install Rust
+echo "Installing Rust tools..."
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+echo "Configuring path..."
+source "$HOME/.cargo/env"
 echo "Done!"
 echo "Press any Enter to finish"
 read
