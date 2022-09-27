@@ -1,6 +1,8 @@
 #! /bin/bash
 
-# MISC:
+# Enable Free and Non free repository
+sudo dnf install https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm
+
 # Projects folder directory
 DIR=~/Projects/
 cd $DIR
@@ -79,9 +81,13 @@ source "$HOME/.cargo/env"
 # Install Emacs
 echo "Installing Emacs..."
 sudo dnf install emacs
-
+# Install Alacritty
+sudo dnf install alacritty
 echo "Updating system..."
 sudo dnf upgrade
+
+# Fix fedora not playing some youtube videos
+sudo dnf install ffmpeg ffmpeg-libs
 echo "Done!"
 echo "Press any Enter to finish"
 read
