@@ -1,5 +1,6 @@
 #! /bin/bash
 
+# MISC:
 # Projects folder directory
 DIR=~/Projects/
 cd $DIR
@@ -60,12 +61,27 @@ cd $DIR
 # Clone my main repositories
 clone_repository "flutter" "https://github.com/notsuitablegroup/mysub-app.git"
 clone_repository "java" "https://github.com/DanikingRD/WK.git"
+clone_repository "c++" "https://github.com/DanikingRD/OpenGL-Setup.git"
+
+# Install VScode
+echo "Installing VSCode..."
+sudo rpm --import https://packages.microsoft.com/keys/microsoft.asc
+sudo sh -c 'echo -e "[code]\nname=Visual Studio Code\nbaseurl=https://packages.microsoft.com/yumrepos/vscode\nenabled=1\ngpgcheck=1\ngpgkey=https://packages.microsoft.com/keys/microsoft.asc" > /etc/yum.repos.d/vscode.repo'
+dnf check-update
+sudo dnf install code
 
 # Install Rust
 echo "Installing Rust tools..."
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 echo "Configuring path..."
 source "$HOME/.cargo/env"
+
+# Install Emacs
+echo "Installing Emacs..."
+sudo dnf install emacs
+
+echo "Updating system..."
+sudo dnf upgrade
 echo "Done!"
 echo "Press any Enter to finish"
 read
