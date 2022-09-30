@@ -78,9 +78,12 @@ curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 echo "Configuring path..."
 source "$HOME/.cargo/env"
 
-# Install Emacs
-echo "Installing Emacs..."
-sudo dnf install emacs
+# Install Doom Emacs
+echo "Installing Doom Emacs..."
+git clone --depth 1 https://github.com/doomemacs/doomemacs ~/.emacs.d
+~/.emacs.d/bin/doom install
+# export PATH="$HOME/.emacs.d/bin:$PATH"
+
 # Install Alacritty
 sudo dnf install alacritty
 
