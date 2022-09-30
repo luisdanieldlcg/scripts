@@ -101,6 +101,10 @@ cd dotfiles-main
 echo "Installing Gnome Tweaks..."
 sudo dnf install gnome-tweaks
 
+# Install CMake
+echo "Installing CMake..."
+sudo dnf install cmake
+
 # Update system  packages
 echo "Updating system..."
 sudo dnf upgrade
