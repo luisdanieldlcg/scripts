@@ -97,6 +97,9 @@ unzip dotfiles.zip
 cd dotfiles-main
 ./run.sh
 
+# Install Gnome Tweaks
+echo "Installing Gnome Tweaks..."
+sudo dnf install gnome-tweaks
 
 # Update system  packages
 echo "Updating system..."
