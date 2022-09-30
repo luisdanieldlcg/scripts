@@ -105,6 +105,10 @@ sudo dnf install gnome-tweaks
 echo "Installing CMake..."
 sudo dnf install cmake
 
+# Install G++ Compiler
+echo "Installing G++..."
+sudo dnf install g++
+
 # Update system  packages
 echo "Updating system..."
 sudo dnf upgrade
