@@ -83,11 +83,22 @@ echo "Installing Emacs..."
 sudo dnf install emacs
 # Install Alacritty
 sudo dnf install alacritty
-echo "Updating system..."
-sudo dnf upgrade
 
 # Fix fedora not playing some youtube videos
 sudo dnf install ffmpeg ffmpeg-libs
+
+# Grab dotfiles and install it
+# Current directory is ~/Projects
+wget https://github.com/DanikingRD/dotfiles/archive/refs/heads/main.zip -O  dotfiles.zip
+unzip dotfiles.zip
+cd dotfiles-main
+./run.sh
+
+
+# Update system  packages
+echo "Updating system..."
+sudo dnf upgrade
+
 echo "Done!"
 echo "Press any Enter to finish"
 read
