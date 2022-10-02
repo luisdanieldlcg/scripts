@@ -1,20 +1,17 @@
-#! /bin/bash
+#!/usr/bin/env bash
+# check distro
+os=$(grep NAME /etc/os-release | head -1 | cut -d'=' -f2 | sed 's/["]//g' | cut -d' ' -f1)
 
 # Enable Free and Non free repository
-sudo dnf install https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm
+if [ "${os}" = "Fedora" ]; then
+	sudo dnf install https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm
+else
+	echo "OS is not Fedora"
+fi
 
 # Projects folder directory
-DIR=~/Projects/
-cd $DIR
-
-# Checks if the given command is available on the system
-command_exists() {
-    if ! [ -x "$(command -v $1)" ]; then
-        echo $1 'is not yet installed.' >&2
-        return 1
-    fi
-        return 0
-}
+DIR="$HOME/Projects"
+[ -d $DIR ] && echo "Directory Exists" || mkdir -p $DIR; echo "Projects folder was created" && cd $DIR
 
 # Clones a repository in the given folder
 # Parameter List
@@ -27,92 +24,137 @@ clone_repository() {
     git clone $2
     cd ..
 }
-# Lookup my Workspace
-if [ -d $DIR ]
-then
-    echo "Directory Exists"
-else
-    mkdir $DIR
-    echo "Projects Folder was created"
+
+# Installs git
+install_git() {
+if [ "${os}" = "Fedora" ]; then
+	sudo dnf install git
+elif [ "${os}" = "Debian" ]; then
+	sudo apt install git
+elif [ "${os}" = "Arch" ]; then
+	sudo pacman -S --needed git
+fi
+}
+
+# System Update
+echo "Updating system..."
+if [ "${os}" = "Fedora" ]; then
+	sudo dnf update
+elif [ "${os}" = "Debian" ]; then
+	sudo apt update && sudo apt upgrade
+elif [ "${os}" = "Arch" ]; then
+	sudo pacman -Syyu
 fi
 
-# Check if git is installed
-# Install it otherwise
-if ! command_exists "git"
-then
-    echo "Installing git..."
-    sudo dnf install git
+# Install some tools
+echo "Installing tools...\n"
+if [ "${os}" = "Fedora" ]; then
+	sudo dnf install wget curl unzip gnome-tweaks flatpak
+elif [ "${os}" = "Debian" ]; then
+	sudo apt install wget curl unzip flatpak
+elif [ "${os}" = "Arch" ]; then
+	sudo pacman -S --needed wget curl unzip flatpak
 fi
-echo "Configuring git..."
-git config --global user.name "DanikingRD"
-git config --global user.email "danikingrd@gmail.com"
+
+# Configuring flatpak
+echo "Installing flathub...\n"
+flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+
+# Check if git is installed
+# Install it otherwise and configure
+[ -x $(command -v git) ] && echo "Git is already installed" || echo "Installing git...\n"; install_git
+[ -f $HOME/.gitconfig ] && gitconfig="true" || gitconfig="false"
+if [ $gitconfig = "false" ]; then
+	git config --global user.name "DanikingRD"
+	git config --global user.email "danikingrd@gmail.com"
+else
+	echo "File .gitconfig exists\n"
+fi
 
 # Check if github cli is installed
 # Install it otherwise
-if ! command_exists "gh"
-then
-    echo "Installing github cli..."
-    sudo dnf install gh
-    echo "Please authenticate to your account"
-    gh auth login
+[ -x $(command -v gh) ] && ghinstall="true" || echo "Installing github-cli...\n"; ghinstall="false"
+if [[ "${os}" = "Fedora" && "${ghinstall}" = "false" ]]; then
+	sudo dnf install gh
+	echo "Please authenticate to your account\n"
+	gh auth login
+elif [[ "${os}" = "Debian" && "${ghinstall}" = "false" ]]; then
+	sudo apt install gitsome # not the same as github-cli but it's close enough
+elif [[ "${os}" = "Arch" && "${ghinstall}" = "false" ]]; then
+	sudo pacman -S --needed github-cli
+	echo "Please authenticate to your account\n"
+	gh auth login
 fi
 
-# Go to workspace folder
-cd $DIR
-
 # Clone my main repositories
+echo "Cloning repositories...\n"
 clone_repository "flutter" "https://github.com/notsuitablegroup/mysub-app.git"
 clone_repository "java" "https://github.com/DanikingRD/WK.git"
 clone_repository "c++" "https://github.com/DanikingRD/OpenGL-Setup.git"
 
-# Install VScode
-echo "Installing VSCode..."
-sudo rpm --import https://packages.microsoft.com/keys/microsoft.asc
-sudo sh -c 'echo -e "[code]\nname=Visual Studio Code\nbaseurl=https://packages.microsoft.com/yumrepos/vscode\nenabled=1\ngpgcheck=1\ngpgkey=https://packages.microsoft.com/keys/microsoft.asc" > /etc/yum.repos.d/vscode.repo'
-dnf check-update
-sudo dnf install code
+# Install VS Codium
+if [ "${os}" = "Fedora" ]; then
+	echo "Installing VS Codium...\n"
+sudo echo "[gitlab.com_paulcarroty_vscodium_repo]
+name=gitlab.com_paulcarroty_vscodium_repo
+baseurl=https://paulcarroty.gitlab.io/vscodium-deb-rpm-repo/rpms/
+enabled=1
+gpgcheck=1
+repo_gpgcheck=1
+gpgkey=https://gitlab.com/paulcarroty/vscodium-deb-rpm-repo/raw/master/pub.gpg
+metadata_expire=1h" | sudo tee -a /etc/yum.repos.d/vscodium.repo > /dev/null
+	sudo dnf check-update
+	sudo dnf install codium
+elif [ "${os}" = "Debian" ]; then
+	wget -qO - https://gitlab.com/paulcarroty/vscodium-deb-rpm-repo/raw/master/pub.gpg \
+	    | gpg --dearmor \
+	    | sudo dd of=/usr/share/keyrings/vscodium-archive-keyring.gpg
+	echo 'deb [ signed-by=/usr/share/keyrings/vscodium-archive-keyring.gpg ] https://paulcarroty.gitlab.io/vscodium-deb-rpm-repo/debs vscodium main' \
+	    | sudo tee /etc/apt/sources.list.d/vscodium.list
+	sudo apt update
+	sudo apt install codium
+elif [ "${os}" = "Arch" ]; then
+	sudo pacman -S --needed base-devel git
+	git clone --depth=1 https://aur.archlinux.org/packages/vscodium-bin && cd vscodium-bin
+	makepkg -si
+	cd ../ && rm -r vscodium-bin
+fi
 
 # Install Rust
-echo "Installing Rust tools..."
+echo "Installing Development tools\n"
+sudo dnf install rust cargo kernel-devel cmake g++ llvm python-isort python-nose python-pipenv python-pytest gcc clang glslang ShellCheck
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 echo "Configuring path..."
 source "$HOME/.cargo/env"
 
-# Install Doom Emacs
-echo "Installing Doom Emacs..."
-git clone --depth 1 https://github.com/doomemacs/doomemacs ~/.emacs.d
-~/.emacs.d/bin/doom install
-# export PATH="$HOME/.emacs.d/bin:$PATH"
+# Install Emacs
+[[ "$(read -e -p 'Do yo want to install doom emacs? [y/N]> '; echo $REPLY)" == [Yy]* ]] && doomwanted="yes" || doomwanted="no"
+if [ $doomwanted = "yes" ]; then
+	echo "Installing Doom Emacs...\n"
+	sudo dnf install emacs
+	git clone --depth=1 https://github.com/doomemacs/doomemacs.git ~/.emacs.d/
+	~/.emacs.d/bin/doom install
+else
+	echo "Skipping...\n"
+fi
 
 # Install Alacritty
-sudo dnf install alacritty
+echo "Installing and configuring alacritty...\n"
+if [ "${os}" = "Fedora" ]; then
+	sudo dnf install alacritty
+elif [ "${os}" = "Debian" ]; then
+	sudo apt install alacritty
+elif [ "${os}" = "Arch" ]; then
+	sudo pacman -S alacritty
+fi
+mkdir -p "$HOME/.local/share/fonts"
+mkdir -p "$HOME/.config/alacritty"
+wget https://github.com/ryanoasis/nerd-fonts/releases/download/v2.2.2/Mononoki.zip && unzip Mononoki.zip && mv mononoki* "$HOME/.local/share/fonts/" && rm Mononki.zip readme.md LICENSE.txt
+wget https://raw.githubusercontent.com/DanikingRD/dotfiles/main/user/.config/alacritty.yml && mv alacritty.yml "$HOME/.config/alacritty"
 
-# Fix fedora not playing some youtube videos
-sudo dnf install ffmpeg ffmpeg-libs
-
-# Grab dotfiles and install it
-# Current directory is ~/Projects
-wget https://github.com/DanikingRD/dotfiles/archive/refs/heads/main.zip -O  dotfiles.zip
-unzip dotfiles.zip
-cd dotfiles-main
-./run.sh
-
-# Install Gnome Tweaks
-echo "Installing Gnome Tweaks..."
-sudo dnf install gnome-tweaks
-
-# Install CMake
-echo "Installing CMake..."
-sudo dnf install cmake
-
-# Install G++ Compiler
-echo "Installing G++..."
-sudo dnf install g++
-
-# Update system  packages
-echo "Updating system..."
-sudo dnf upgrade
-
+# Install media libraries
+echo "Installing multimedia codecs...\n"
+sudo dnf install ffmpeg ffmpeg-libs gstreamer1-plugins-{bad-\*,good-\*,base} gstreamer1-plugin-openh264 gstreamer1-libav --exclude=gstreamer1-plugins-bad-free-devel
 echo "Done!"
-echo "Press any Enter to finish"
+echo "Press any Enter to finish\n"
 read
