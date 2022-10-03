@@ -6,12 +6,12 @@ os=$(grep NAME /etc/os-release | head -1 | cut -d'=' -f2 | sed 's/["]//g' | cut 
 if [ "${os}" = "Fedora" ]; then
 	sudo dnf install https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm
 else
-	echo "OS is not Fedora"
+	echo -e "OS is not Fedora\n"
 fi
 
 # Projects folder directory
 DIR="$HOME/Projects"
-[ -d $DIR ] && echo "Directory Exists" || mkdir -p $DIR; echo "Projects folder was created" && cd $DIR
+[ -d $DIR ] && echo "Directory Exists" || mkdir -p $DIR; echo -e "Projects folder was created\n" && cd $DIR
 
 # Clones a repository in the given folder
 # Parameter List
@@ -37,7 +37,7 @@ fi
 }
 
 # System Update
-echo "Updating system..."
+echo -e "Updating system...\n"
 if [ "${os}" = "Fedora" ]; then
 	sudo dnf update
 elif [ "${os}" = "Debian" ]; then
@@ -47,7 +47,7 @@ elif [ "${os}" = "Arch" ]; then
 fi
 
 # Install some tools
-echo "Installing tools...\n"
+echo -e "Installing tools...\n"
 if [ "${os}" = "Fedora" ]; then
 	sudo dnf install wget curl unzip gnome-tweaks flatpak
 elif [ "${os}" = "Debian" ]; then
@@ -57,44 +57,44 @@ elif [ "${os}" = "Arch" ]; then
 fi
 
 # Configuring flatpak
-echo "Installing flathub...\n"
+echo -e "Installing flathub...\n"
 flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
 
 # Check if git is installed
 # Install it otherwise and configure
-[ -x $(command -v git) ] && echo "Git is already installed" || echo "Installing git...\n"; install_git
+[ -x $(command -v git) ] && echo -e "Git is already installed\n" || echo -e "Installing git...\n"; install_git
 [ -f $HOME/.gitconfig ] && gitconfig="true" || gitconfig="false"
 if [ $gitconfig = "false" ]; then
 	git config --global user.name "DanikingRD"
 	git config --global user.email "danikingrd@gmail.com"
 else
-	echo "File .gitconfig exists\n"
+	echo -e "File .gitconfig exists\n"
 fi
 
 # Check if github cli is installed
 # Install it otherwise
-[ -x $(command -v gh) ] && ghinstall="true" || echo "Installing github-cli...\n"; ghinstall="false"
+[ -x $(command -v gh) ] && ghinstall="true" || echo -e "Installing github-cli...\n"; ghinstall="false"
 if [[ "${os}" = "Fedora" && "${ghinstall}" = "false" ]]; then
 	sudo dnf install gh
-	echo "Please authenticate to your account\n"
+	echo -e "Please authenticate to your account\n"
 	gh auth login
 elif [[ "${os}" = "Debian" && "${ghinstall}" = "false" ]]; then
 	sudo apt install gitsome # not the same as github-cli but it's close enough
 elif [[ "${os}" = "Arch" && "${ghinstall}" = "false" ]]; then
 	sudo pacman -S --needed github-cli
-	echo "Please authenticate to your account\n"
+	echo -e "Please authenticate to your account\n"
 	gh auth login
 fi
 
 # Clone my main repositories
-echo "Cloning repositories...\n"
+echo -e "Cloning repositories...\n"
 clone_repository "flutter" "https://github.com/notsuitablegroup/mysub-app.git"
 clone_repository "java" "https://github.com/DanikingRD/WK.git"
 clone_repository "c++" "https://github.com/DanikingRD/OpenGL-Setup.git"
 
 # Install VS Codium
 if [ "${os}" = "Fedora" ]; then
-	echo "Installing VS Codium...\n"
+	echo -e "Installing VS Codium...\n"
 sudo echo "[gitlab.com_paulcarroty_vscodium_repo]
 name=gitlab.com_paulcarroty_vscodium_repo
 baseurl=https://paulcarroty.gitlab.io/vscodium-deb-rpm-repo/rpms/
@@ -121,25 +121,35 @@ elif [ "${os}" = "Arch" ]; then
 fi
 
 # Install Rust
-echo "Installing Development tools\n"
-sudo dnf install rust cargo kernel-devel cmake g++ llvm python-isort python-nose python-pipenv python-pytest gcc clang glslang ShellCheck
-curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
-echo "Configuring path..."
-source "$HOME/.cargo/env"
+echo -e "Installing Development tools\n"
+if [ "${os}" = "Fedora" ]; then
+	sudo dnf install rust cargo kernel-devel cmake g++ llvm python-isort python-nose python-pipenv python-pytest gcc clang glslang ShellCheck sbcl
+elif [ "${os}" = "Debian" ]; then
+	sudo apt install rust cargo build-essential cmake g++ gcc llvm python-isort python-nose python-pipenv python-pytest clang glslang shellcheck tidy sbcl
+elif [ "${os}" = "Arch" ]; then
+	sudo pacman -S --needed base-devel rust cargo cmake gcc llvm python-isort python-nose python-pipenv python-pytest clang glslang shellcheck tidy sbcl
+fi
 
 # Install Emacs
-[[ "$(read -e -p 'Do yo want to install doom emacs? [y/N]> '; echo $REPLY)" == [Yy]* ]] && doomwanted="yes" || doomwanted="no"
-if [ $doomwanted = "yes" ]; then
-	echo "Installing Doom Emacs...\n"
+[[ "$(read -e -p 'Do yo want to install doom emacs? [y/N]> '; echo $REPLY)" == [Yy]* ]] && echo -e "Installing Doom Emacs...\n"; doomwanted="yes" || doomwanted="no"
+if [[ "${os}" = "Fedora" && $doomwanted = "yes" ]]; then
 	sudo dnf install emacs
 	git clone --depth=1 https://github.com/doomemacs/doomemacs.git ~/.emacs.d/
 	~/.emacs.d/bin/doom install
+elif [[ "${os}" = "Debian" && $doomwanted = "yes" ]]; then
+	sudo apt install emacs
+	git clone --depth=1 https://github.com/doomemacs/doomemacs.git ~/.emacs.d/
+	~/.emacs.d/bin/doom install
+elif [[ "${os}" = "Arch" && $doomwanted = "yes" ]]; then
+	sudo pacman -S --needed emacs
+	git clone --depth=1 https://github.com/doomemacs/doomemacs.git ~/.emacs.d/
+	~/.emacs.d/bin/doom install
 else
-	echo "Skipping...\n"
+	echo -e "Skipping...\n"
 fi
 
 # Install Alacritty
-echo "Installing and configuring alacritty...\n"
+echo -e "Installing and configuring alacritty...\n"
 if [ "${os}" = "Fedora" ]; then
 	sudo dnf install alacritty
 elif [ "${os}" = "Debian" ]; then
@@ -153,8 +163,8 @@ wget https://github.com/ryanoasis/nerd-fonts/releases/download/v2.2.2/Mononoki.z
 wget https://raw.githubusercontent.com/DanikingRD/dotfiles/main/user/.config/alacritty.yml && mv alacritty.yml "$HOME/.config/alacritty"
 
 # Install media libraries
-echo "Installing multimedia codecs...\n"
+echo -e "Installing multimedia codecs...\n"
 sudo dnf install ffmpeg ffmpeg-libs gstreamer1-plugins-{bad-\*,good-\*,base} gstreamer1-plugin-openh264 gstreamer1-libav --exclude=gstreamer1-plugins-bad-free-devel
-echo "Done!"
-echo "Press any Enter to finish\n"
+echo -e "Done\n"
+echo -e "Press any Enter to finish\n"
 read
