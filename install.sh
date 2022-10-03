@@ -2,11 +2,16 @@
 # check distro
 os=$(grep NAME /etc/os-release | head -1 | cut -d'=' -f2 | sed 's/["]//g' | cut -d' ' -f1)
 
-# Enable Free and Non free repository
+# Enable extra repositories
 if [ "${os}" = "Fedora" ]; then
 	sudo dnf install https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm
-else
-	echo -e "OS is not Fedora\n"
+elif [ "${os}" = "Debian" ]; then
+	sudo apt-add-repository non-free contrib
+	sudo echo -e "deb http://www.deb-multimedia.org bullseye main non-free" >> /etc/apt/sources.list
+	sudo apt update --allow-insecure-repositories -y
+	sudo apt install deb-multimedia-keyring -y
+elif [ "${os}" = "Arch" ]; then
+	sudo sed -i "/\[multilib\]/,/Include/"'s/^#//' /etc/pacman.conf
 fi
 
 # Projects folder directory
@@ -157,14 +162,28 @@ elif [ "${os}" = "Debian" ]; then
 elif [ "${os}" = "Arch" ]; then
 	sudo pacman -S alacritty
 fi
+
+# Installing fonts and configuring alacritty
 mkdir -p "$HOME/.local/share/fonts"
 mkdir -p "$HOME/.config/alacritty"
-wget https://github.com/ryanoasis/nerd-fonts/releases/download/v2.2.2/Mononoki.zip && unzip Mononoki.zip && mv mononoki* "$HOME/.local/share/fonts/" && rm Mononki.zip readme.md LICENSE.txt
+wget https://github.com/ryanoasis/nerd-fonts/releases/download/v2.2.2/Mononoki.zip
+unzip Mononoki.zip
+cd Mononoki
+mv mononoki* "$HOME/.local/share/fonts/"
+cd ../
+rm Mononoki*
 wget https://raw.githubusercontent.com/DanikingRD/dotfiles/main/user/.config/alacritty.yml && mv alacritty.yml "$HOME/.config/alacritty"
 
 # Install media libraries
 echo -e "Installing multimedia codecs...\n"
-sudo dnf install ffmpeg ffmpeg-libs gstreamer1-plugins-{bad-\*,good-\*,base} gstreamer1-plugin-openh264 gstreamer1-libav --exclude=gstreamer1-plugins-bad-free-devel
+if [ "${os}" = "Fedora" ]; then
+	sudo dnf install ffmpeg ffmpeg-libs gstreamer1-plugins-{bad-\*,good-\*,base} gstreamer1-plugin-openh264 gstreamer1-libav --exclude=gstreamer1-plugins-bad-free-devel
+elif [ "${os}" = "Debian" ]; then
+	sudo apt install libavcodec-extra gstreamer1.0-vaapi gstreamer1.0-plugins-* gstreamer1.0-alsa gstreamer1.0-libav
+elif [ "${os}" = "Arch" ]; then
+	sudo pacman -S --needed gstreamer gst-plugins-bad gst-plugins-base gst-plugins-base-libs gst-plugins-good gst-plugins-ugly
+fi
+
 echo -e "Done\n"
 echo -e "Press any Enter to finish\n"
 read
