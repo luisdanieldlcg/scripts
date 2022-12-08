@@ -1,4 +1,9 @@
 #!/usr/bin/env bash
+
+################ NO LONGER USED ####################33
+# This script file is left here for future reference, but it's no longer being used
+
+
 # Install and setup distro script
 distro=$(grep NAME /etc/os-release | cut -d'=' -f2 | head -1 | sed 's/["]//g' | cut -d' ' -f1)
 DIR="$HOME/Projects"
