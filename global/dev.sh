@@ -1,5 +1,10 @@
 #!/bin/bash
 
+SDK_DIR="$HOME/Projects/SDKs"
+EXPORT_LOCATION="$HOME/.bashrc"
+
+mkdir -p "$SDK_DIR"
+
 prompt() {
     read -r -p "Press y to install $1 or any other key to skip it: " bool
     case $bool in
@@ -18,8 +23,11 @@ install_rust() {
 }
 install_flutter() {
     if prompt "Dart & Flutter"; then
-        echo ""
-        # TODO: fetch flutter sdk & configure environment variables
+        src="$SDK_DIR/flutter"
+        mkdir "$src"
+        git clone https://github.com/flutter/flutter.git -b stable "$src"
+        echo "export PATH=$PATH:$SDK_DIR/flutter/bin" >> "$EXPORT_LOCATION"
+        flutter
     fi
 }
 
