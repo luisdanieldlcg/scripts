@@ -27,8 +27,26 @@ install_codecs() {
 	--exclude=gstreamer1-plugins-bad-free-devel
 }
 
+install_other() {
+    echo "Installing other packages..."
+    sudo dnf install -y \
+	gh \ 
+        alacritty \
+    	gnome-tweaks \
+	gnome-extensions-app
+}
+
+edit_gnome() {
+    echo "Editing gnome..."
+    dconf write /org/gnome/desktop/wm/preferences/button-layout "'appmenu:minimize,close'"
+    sudo dnf -y copr enable dirkdavidis/papirus-icon-theme
+    sudo dnf -y install papirus-icon-theme
+    dconf write /org/gnome/desktop/interface/icon-theme "'Papirus'"
+}
 
 add_rpm_repositories
 update_system
 configure_git
 install_codecs
+install_other
+edit_gnome

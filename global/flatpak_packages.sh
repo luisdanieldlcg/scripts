@@ -4,7 +4,7 @@
 
 install_flatpak_packages() {
     echo "Installing Flatpak packages..."
-    flatpak install -y flathub com.discordapp.Discord org.gnu.emacs org.videolan.VLC
+    flatpak install -y flathub com.discordapp.Discord org.videolan.VLC
     flatpak update
     echo -e "Installed flatpak packages: \n"
     flatpak list
