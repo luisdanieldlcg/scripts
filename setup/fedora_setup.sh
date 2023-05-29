@@ -29,11 +29,13 @@ install_codecs() {
 
 install_other() {
     echo "Installing other packages..."
-    sudo dnf install -y \
-	gh \ 
-        alacritty \
-    	gnome-tweaks \
-	gnome-extensions-app
+    sudo dnf install gh gnome-tweaks gnome-extensions-app alacritty
+}
+
+install_helix() {
+    # Enable COPR repo
+    sudo dnf copr enable varlad/helix
+    sudo dnf install helix
 }
 
 edit_gnome() {
@@ -45,8 +47,7 @@ edit_gnome() {
 }
 
 add_rpm_repositories
-update_system
-configure_git
 install_codecs
 install_other
 edit_gnome
+update_system
