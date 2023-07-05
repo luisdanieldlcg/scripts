@@ -20,6 +20,8 @@ install_rust() {
     if prompt "Rust"; then
         curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
     fi
+    echo "export PATH=$HOME/.cargo/bin:$PATH" >> "$EXPORT_LOCATION"
+    source "$HOME/.cargo/env"
 }
 install_flutter() {
     if prompt "Dart & Flutter"; then
