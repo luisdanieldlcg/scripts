@@ -5,7 +5,7 @@
 
 # Constants
 DISTRIBUTION=$(grep NAME /etc/os-release | cut -d'=' -f2 | head -1 | sed 's/["]//g' | cut -d' ' -f1)
-PROJECTS_DIR="$HOME/Projects/"
+PROJECTS_DIR="$HOME/dev/"
 GLOBAL_DIR="./global"
 SCRIPT_SETUP="./setup/${DISTRIBUTION,,}_setup.sh"
 

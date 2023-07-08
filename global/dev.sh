@@ -23,6 +23,7 @@ install_rust() {
     echo "export PATH=$HOME/.cargo/bin:$PATH" >> "$EXPORT_LOCATION"
     source "$HOME/.cargo/env"
 }
+
 install_flutter() {
     if prompt "Dart & Flutter"; then
         src="$SDK_DIR/flutter"
