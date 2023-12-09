@@ -27,19 +27,28 @@ install_codecs() {
 	--exclude=gstreamer1-plugins-bad-free-devel
 }
 
-install_other() {
-    echo "Installing other packages..."
-    sudo dnf install gh gnome-tweaks gnome-extensions-app alacritty
-}
-
-install_helix() {
+install_essential() {
     # Enable COPR repo
     sudo dnf copr enable varlad/helix
-    sudo dnf install helix
+    sudo dnf install alacritty helix gh
+    configure_github
+    install_fonts
 }
 
-edit_gnome() {
-    echo "Editing gnome..."
+install_fonts() {
+    echo "Installing Iosevka Term font..."
+    sudo dnf copr enable peterwu/iosevka
+    sudo dnf install iosevka-term-fonts
+}
+
+configure_github() {
+   echo "Configuring github account"
+   gh auth login
+}
+
+apply_custom_gnome_tweaks() {
+    echo "Aplying custom gnome tweaks..."
+    sudo dnf install gnome-tweaks gnome-extensions-app
     dconf write /org/gnome/desktop/wm/preferences/button-layout "'appmenu:minimize,close'"
     sudo dnf -y copr enable dirkdavidis/papirus-icon-theme
     sudo dnf -y install papirus-icon-theme
@@ -48,6 +57,13 @@ edit_gnome() {
 
 add_rpm_repositories
 install_codecs
-install_other
-edit_gnome
+
+read -p "Do you want to apply custom gnome tweaks (e.g install papirus theme) (Y/N): " -n 1 -r
+echo
+if [[ $REPLY =~ ^[Yy]$ ]]
+then
+    apply_custom_gnome_tweaks
+fi
+
 update_system
+install_essential
