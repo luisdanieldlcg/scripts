@@ -18,13 +18,7 @@ update_system() {
 # for Fedora Linux.
 install_codecs() {
     echo -e "Installing multimedia codecs...\n"
-    sudo dnf install -y \
-    ffmpeg \
-	ffmpeg-libs \
-	gstreamer1-plugins-{bad-\*,good-\*,base} \
-	gstreamer1-plugin-openh264 \
-	gstreamer1-libav \
-	--exclude=gstreamer1-plugins-bad-free-devel
+    sudo dnf install -y --allowerasing ffmpeg
 }
 
 install_essential() {

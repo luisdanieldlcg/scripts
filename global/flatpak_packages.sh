@@ -11,10 +11,8 @@ install_flatpak_packages() {
     flatpak install -y flathub com.discordapp.Discord \
             org.videolan.VLC \
             org.telegram.desktop \
-            com.helix_editor.Helix \
             com.obsproject.Studio \
             org.signal.Signal \
-            com.brave.Browser
 
     create_aliases
     prompt_other_devtools
@@ -30,8 +28,6 @@ create_aliases() {
     echo "# Flatpak aliases" >> "$EXPORT_LOCATION"
     echo "alias discord='flatpak run com.discordapp.Discord'" >> "$EXPORT_LOCATION"
     echo "alias vlc='flatpak run org.videolan.VLC'" >> "$EXPORT_LOCATION"
-    echo "alias helix='flatpak run com.helix_editor.Helix'; alias hx='helix'" >> "$EXPORT_LOCATION"
-    echo "alias brave='flatpak run com.brave.Browser'" >> "$EXPORT_LOCATION"
     source "$HOME/.bashrc"
 }
 
