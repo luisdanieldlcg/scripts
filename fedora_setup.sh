@@ -10,6 +10,7 @@ EXPORT_LOCATION="$HOME/.bashrc"
 mkdir -p "$FONTS_DIR"
 mkdir -p "$PROJECTS_DIR"
 
+# Prompt the user whether to install a package or not 
 prompt() {
     read -r -p "Press y to install $1 or any other key to skip it: " bool
     case $bool in
@@ -21,23 +22,43 @@ prompt() {
     esac
 }
 
-# 1) install the RPM Fusion repositories
+# a function to create custom keybindings
+# first arg: a number assigned to keybinding
+# second arg: name of the keybinding
+# third arg: command for the keybinding
+# forth arg: the keyboard shortcut for the keybinding
+# from: https://stackoverflow.com/questions/56457682/setting-up-gnome-keybindings-in-a-bash-function
+function key {
+    gsettings set "org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom$1/" name "$2"
+    gsettings set "org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom$1/" command "$3"
+    gsettings set "org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom$1/" binding "$4"
+    gsettings set org.gnome.settings-daemon.plugins.media-keys custom-keybindings "['/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom$1/']"
+}
+
+# Set my custom keybindings
+# open terminal with win + enter
+key 0 "Wezterm" "wezterm" "<Super>Return"
+# open nautilus with win + e
+key 1 "Nautilus File Manager" "nautilus" "<Super>e"
+
+
+# Install the RPM Fusion repositories
 # This will provide additional packages for Fedora  
 echo "Adding rpm fusion repositories"
 sudo dnf install -y \
 	https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-"$(rpm -E %fedora).noarch.rpm" \
 	https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-"$(rpm -E %fedora).noarch.rpm"
 
-# 2) Update the system
+# Update the system
 sudo dnf update -y
 
-# 3) Install essential packages 
+# Install essential packages 
 echo -e "Installing multimedia codecs...\n"
 sudo dnf install -y --allowerasing ffmpeg
 sudo dnf install -y https://github.com/wez/wezterm/releases/download/20240203-110809-5046fc22/wezterm-20240203_110809_5046fc22-1.fedora39.x86_64.rpm
 sudo dnf install -y gh
 
-# 4) Configure git & github
+# Configure git & github
 # Git comes preinstalled on Fedora Linux
 echo "Configuring Git..."
 read -r -p "Enter your Git username: " username
@@ -50,7 +71,7 @@ git config --list
 echo "Configuring github account"
 gh auth login
 
-# 5) Install fonts
+# Install fonts
 echo "Installing fonts..."
 sudo dnf copr enable peterwu/iosevka
 sudo dnf install iosevka-term-fonts
@@ -65,13 +86,13 @@ find . -type f ! -name "*.sh" -exec rm -rf {} \;
 # This is left over
 rm -r fonts/
 
-# 6) Install some flatpak packages I use
+# Install some flatpak packages I use
 flatpak install -y flathub com.discordapp.Discord \
 	org.videolan.VLC \
 	com.obsproject.Studio \
 	org.signal.Signal \
 
-# 7) Install development tools
+# Install development tools
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 echo "export PATH=$HOME/.cargo/bin:$PATH" >> "$EXPORT_LOCATION"
 source "$HOME/.cargo/env"
