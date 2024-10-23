@@ -16,13 +16,6 @@ sh ~/dotfiles/install.sh
 
 echo "Installing dependencies"
 sudo pacman -S 
-    # Hyprland stuff + status bar
-    hyprland hyprpaper waybar \
-    # Screenshots
-    grim slurp wl-clipboard \
-    # XDG tools for directories
-    xdg-user-dirs xdg-utils \
-    # Git / Github
     git less github-cli \
     ttf-fira-code \
     alacritty \
@@ -30,10 +23,6 @@ sudo pacman -S
     neovim \
     ripgrep --noconfirm
 
-paru -S --noconfirm rofi-wayland 
-
-echo "Setting user directories"
-xdg-user-dirs-update
 
 echo "Setting up Git"
 git config --global user.email "luisdanieldlcg@gmail.com"
