@@ -15,14 +15,23 @@ mv dotfiles ~/
 sh ~/dotfiles/install.sh
 
 echo "Installing dependencies"
-sudo pacman -S 
-    git less github-cli \
+sudo pacman -S git \
+    github-cli \
     ttf-fira-code \
     alacritty \
     firefox \
     neovim \
-    ripgrep --noconfirm
+    ripgrep \
+    xdg-user-dirs \
+    xdg-utils \
+    grim \
+    slurp \
+    wl-clipboard \
+    ttf-nerd-fonts-symbols \
+    pavucontrol
+    less --noconfirm
 
+paru -S rofi-wayland
 
 echo "Setting up Git"
 git config --global user.email "luisdanieldlcg@gmail.com"
