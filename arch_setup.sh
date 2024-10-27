@@ -28,7 +28,8 @@ sudo pacman -S git \
     slurp \
     wl-clipboard \
     ttf-nerd-fonts-symbols \
-    pavucontrol
+    pavucontrol \
+    htop
     less --noconfirm
 
 paru -S rofi-wayland
@@ -36,6 +37,7 @@ paru -S rofi-wayland
 echo "Setting up Git"
 git config --global user.email "luisdanieldlcg@gmail.com"
 git config --global user.name "luisdanieldlcg"
+git config --global core.editor "nvim"
 
 echo "Authenticating with github"
 gh auth login

@@ -61,11 +61,9 @@ sudo dnf install -y gh
 # Configure git & github
 # Git comes preinstalled on Fedora Linux
 echo "Configuring Git..."
-read -r -p "Enter your Git username: " username
-git config --global user.name "$username"
-read -r -p "Enter your Git email: " email
-git config --global user.email "$email"
-echo "Printing your git config..."
+git config --global user.email "luisdanieldlcg@gmail.com"
+git config --global user.name "luisdanieldlcg"
+git config --global core.editor "nvim"
 git config --list
 
 echo "Configuring github account"
