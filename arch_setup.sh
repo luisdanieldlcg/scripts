@@ -16,8 +16,10 @@ sh ~/dotfiles/install.sh
 
 echo "Installing dependencies"
 sudo pacman -S git \
+    'less' \
     github-cli \
     ttf-fira-code \
+    ttf-jetbrains-mono \
     alacritty \
     firefox \
     neovim \
@@ -28,9 +30,9 @@ sudo pacman -S git \
     slurp \
     wl-clipboard \
     ttf-nerd-fonts-symbols \
+    wlogout \
     pavucontrol \
-    htop
-    less --noconfirm
+    htop --noconfirm
 
 paru -S rofi-wayland
 
@@ -38,7 +40,4 @@ echo "Setting up Git"
 git config --global user.email "luisdanieldlcg@gmail.com"
 git config --global user.name "luisdanieldlcg"
 git config --global core.editor "nvim"
-
-echo "Authenticating with github"
-gh auth login
 
